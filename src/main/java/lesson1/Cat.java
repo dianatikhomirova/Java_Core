@@ -2,13 +2,10 @@ package lesson1;
 
 import java.util.Objects;
 
-public class Cat extends Animal implements CanSwim {
+public class Cat extends Animal implements CanSwim, CanJump {
     private boolean isWild;
     private double swimmingSpeed;
-
-    public Cat() {
-        super("asdf", "asdgf", 4);
-    }
+    private double jumpingSpeed;
 
     public double getSwimmingSpeed() {
         return swimmingSpeed;
@@ -16,6 +13,14 @@ public class Cat extends Animal implements CanSwim {
 
     public void setSwimmingSpeed(int swimmingSpeed) {
         this.swimmingSpeed = swimmingSpeed;
+    }
+
+    public double getJumpingSpeed() {
+        return jumpingSpeed;
+    }
+
+    public void setJumpingSpeed(double jumpingSpeed) {
+        this.jumpingSpeed = jumpingSpeed;
     }
 
     public Cat(String name, String color, int age) {
@@ -100,12 +105,11 @@ public class Cat extends Animal implements CanSwim {
         return timeToOvercome;
     }
 
-    public static void main(String[] args) {
-        Cat cat1 = new Cat();
-        cat1.setAge(1);
-        cat1.setWild(true);
-        cat1.setSwimmingSpeed(4);
-
-        cat1.setColorBuild("white").setWild(true);
+    @Override
+    public double jump(Wall wall) {
+        System.out.println("Я кот, я прыгаю!");
+        double timeToOvercome = wall.getHeight() / jumpingSpeed;
+        System.out.println(timeToOvercome);
+        return timeToOvercome;
     }
 }

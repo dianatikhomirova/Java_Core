@@ -1,7 +1,7 @@
 package lesson1;
 
 public class Turtle extends Animal implements CanSwim {
-    private int swimmingSpeed;
+    private double swimmingSpeed;
 
     public Turtle(String name, String color, int age, int swimmingSpeed) {
         super(name, color, age);
@@ -12,11 +12,11 @@ public class Turtle extends Animal implements CanSwim {
         super(name, color, age);
     }
 
-    public int getSwimmingSpeed() {
+    public double getSwimmingSpeed() {
         return swimmingSpeed;
     }
 
-    public void setSwimmingSpeed(int swimmingSpeed) {
+    public void setSwimmingSpeed(double swimmingSpeed) {
         this.swimmingSpeed = swimmingSpeed;
     }
 
