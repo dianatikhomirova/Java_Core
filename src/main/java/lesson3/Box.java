@@ -1,40 +1,46 @@
 package lesson3;
 
-public class Box {
-    private Object object;
+import java.util.ArrayList;
 
-    public Box(Object object) {
-        this.object = object;
+public class Box<T extends Fruit> {
+    private ArrayList<T> fruitList = new ArrayList<>();
+
+    public Box() {
     }
 
-    public Object getObject() {
-        return object;
+    public ArrayList<T> getFruitList() {
+        return fruitList;
     }
 
-    public void setObject(Object object) {
-        this.object = object;
+    public void setFruitList(ArrayList<T> fruitList) {
+        this.fruitList = fruitList;
+    }
+
+    public void addFruit(T fruit) {
+        fruitList.add(fruit);
+    }
+
+    public float getWeight() {
+        return fruitList.size() * T.getWeight();
+    }
+
+    public boolean pourOver(Box<T> box) {
+        if (Integer.MAX_VALUE - box.getFruitList().size() < fruitList.size()) {
+            return false;
+        }
+        box.getFruitList().addAll(fruitList);
+        fruitList.clear();
+        return true;
+    }
+
+    public boolean compare(Box box) {
+        return this.getWeight() == box.getWeight();
     }
 
     @Override
     public String toString() {
         return "Box{" +
-                "object=" + object +
+                "fruitList=" + fruitList +
                 '}';
-    }
-
-    public static void main(String[] args) {
-        Box box1 = new Box(5);
-        Box box2 = new Box(10);
-
-        System.out.println(box1.getObject().getClass());
-
-        int sum = (Integer) box1.getObject() + (Integer) box2.getObject();
-        System.out.println(sum);
-
-        Box box3 = new Box("Test");
-
-        if (box1.getObject() instanceof Integer && box3.getObject() instanceof Integer) {
-            int sum2 = (Integer) box1.getObject() + (Integer) box3.getObject();
-        }
     }
 }
