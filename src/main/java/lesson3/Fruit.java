@@ -1,13 +1,13 @@
 package lesson3;
 
 public abstract class Fruit {
-    private float weight;
+    private static float weight;
 
     public Fruit(float weight) {
         this.weight = weight;
     }
 
-    public float getWeight() {
+    public static float getWeight() {
         return weight;
     }
 

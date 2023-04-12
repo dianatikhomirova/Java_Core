@@ -1,7 +1,8 @@
 package lesson3;
 
 public class Orange extends Fruit {
+    private final static float weight = 1.5f;
     public Orange() {
-        super(1.5f);
+        super(weight);
     }
 }

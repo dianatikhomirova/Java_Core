@@ -21,10 +21,7 @@ public class Box<T extends Fruit> {
     }
 
     public float getWeight() {
-        if (fruitList.size() == 0) {
-            return 0;
-        }
-        return fruitList.size() * fruitList.get(0).getWeight();
+        return fruitList.size() * T.getWeight();
     }
 
     public boolean pourOver(Box<T> box) {
