@@ -7,7 +7,10 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class AccuweatherModel implements WeatherModel {
@@ -28,7 +31,9 @@ public class AccuweatherModel implements WeatherModel {
     private static final OkHttpClient okHttpClient = new OkHttpClient();
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public void getWeather(String selectedCity, Period period) throws IOException {
+    public void getWeather(String selectedCity, Period period) throws IOException, SQLException {
+        DataBaseRepository dataBaseRepository = new DataBaseRepository();
+
         switch (period) {
             case NOW:
                 HttpUrl httpUrl = new HttpUrl.Builder()
@@ -54,6 +59,8 @@ public class AccuweatherModel implements WeatherModel {
                 String tempMin = objectMapper.readTree(weatherResponse).at("/DailyForecasts/0/Temperature/Minimum/Value").asText();
                 String tempMax = objectMapper.readTree(weatherResponse).at("/DailyForecasts/0/Temperature/Maximum/Value").asText();
 
+                dataBaseRepository.saveWeatherToDataBase(new Weather(selectedCity, dateTime.toLocalDate().toString(), text, (Double.parseDouble(tempMin) + Double.parseDouble(tempMax)) / 2));
+
                 System.out.printf("| В городе %s на дату %s ожидается %s, температура - %s-%s F |\n", selectedCity, dateTime.toLocalDate(), text, tempMin, tempMax);
                 break;
             case FIVE_DAYS:
@@ -75,6 +82,7 @@ public class AccuweatherModel implements WeatherModel {
                 Response fiveDayForecastResponse = okHttpClient.newCall(requestFive).execute();
                 String weatherResponse5 = fiveDayForecastResponse.body().string();
 
+                List<Weather> weatherList = new ArrayList<>();
                 for (int i = 0; i < 5; i++) {
                     dateTimeStr = objectMapper.readTree(weatherResponse5).at(String.format("/DailyForecasts/%d/Date", i)).asText().split("\\+")[0];
                     dateTime = LocalDateTime.parse(dateTimeStr);
@@ -82,8 +90,12 @@ public class AccuweatherModel implements WeatherModel {
                     tempMin = objectMapper.readTree(weatherResponse5).at(String.format("/DailyForecasts/%d/Temperature/Minimum/Value", i)).asText();
                     tempMax = objectMapper.readTree(weatherResponse5).at(String.format("/DailyForecasts/%d/Temperature/Maximum/Value", i)).asText();
 
+                    weatherList.add(new Weather(selectedCity, dateTime.toLocalDate().toString(), text, (Double.parseDouble(tempMin) + Double.parseDouble(tempMax)) / 2));
+
                     System.out.printf("| В городе %s на дату %s ожидается %s, температура - %s-%s F |\n", selectedCity, dateTime.toLocalDate(), text, tempMin, tempMax);
                 }
+
+                dataBaseRepository.saveWeatherToDataBase(weatherList);
 
                 break;
         }
@@ -111,7 +123,6 @@ public class AccuweatherModel implements WeatherModel {
         Response response = okHttpClient.newCall(request).execute();
         String responseString = response.body().string();
 
-        String cityKey = objectMapper.readTree(responseString).get(0).at("/Key").asText();
-        return cityKey;
+        return objectMapper.readTree(responseString).get(0).at("/Key").asText();
     }
 }

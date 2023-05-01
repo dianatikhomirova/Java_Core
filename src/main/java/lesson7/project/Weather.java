@@ -1,13 +1,15 @@
-package lesson7.project.entity;
+package lesson7.project;
 
 public class Weather {
     private String city;
     private String localDate;
+    private String weatherText;
     private double temperature;
 
-    public Weather(String city, String localDate, double temperature) {
+    public Weather(String city, String localDate, String weatherText, double temperature) {
         this.city = city;
         this.localDate = localDate;
+        this.weatherText = weatherText;
         this.temperature = temperature;
     }
 
@@ -35,11 +37,20 @@ public class Weather {
         this.temperature = temperature;
     }
 
+    public String getWeatherText() {
+        return weatherText;
+    }
+
+    public void setWeatherText(String weatherText) {
+        this.weatherText = weatherText;
+    }
+
     @Override
     public String toString() {
         return "Weather{" +
                 "city='" + city + '\'' +
                 ", localDate='" + localDate + '\'' +
+                ", weatherText='" + weatherText + '\'' +
                 ", temperature=" + String.format("%.2f", temperature) +
                 '}';
     }
