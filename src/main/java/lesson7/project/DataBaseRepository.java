@@ -1,22 +1,11 @@
 package lesson7.project;
 
-import lesson7.project.entity.Weather;
-
-import java.io.Reader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.sql.*;
 import java.util.List;
 
 public class DataBaseRepository {
-    private String insertWeather = "insert into weather (city, localdate, temperature) values (?, ?, ?)";
-    private String getWeather = "select * from weather";
-    private static final String DB_PATH = "jdbc:sqlite:geekbrains.db";
+    private final String insertWeather = "insert into weather (city, localdate, text, temperature) values (?, ?, ?, ?)";
+    private static final String DB_PATH = "jdbc:sqlite:local.db";
 
     static {
         try {
@@ -27,11 +16,11 @@ public class DataBaseRepository {
     }
 
     public boolean saveWeatherToDataBase(Weather weather) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DB_PATH)) {
-            PreparedStatement saveWeather = connection.prepareStatement(insertWeather);
+        try (Connection connection = DriverManager.getConnection(DB_PATH); PreparedStatement saveWeather = connection.prepareStatement(insertWeather)) {
             saveWeather.setString(1, weather.getCity());
             saveWeather.setString(2, weather.getLocalDate());
-            saveWeather.setDouble(3, weather.getTemperature());
+            saveWeather.setString(3, weather.getWeatherText());
+            saveWeather.setDouble(4, weather.getTemperature());
             return saveWeather.execute();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -39,13 +28,14 @@ public class DataBaseRepository {
         throw new SQLException("Сохранение погоды в базу данных не выполнено!");
     }
 
-    public void saveWeatherToDataBase(List<Weather> weatherList) throws SQLException {
-        try (Connection connection = DriverManager.getConnection(DB_PATH)) {
-            PreparedStatement saveWeather = connection.prepareStatement(insertWeather);
+    public void saveWeatherToDataBase(List<Weather> weatherList) {
+        // Java will close all the connections there is exit from try block
+        try (Connection connection = DriverManager.getConnection(DB_PATH); PreparedStatement saveWeather = connection.prepareStatement(insertWeather)) {
             for (Weather weather : weatherList) {
                 saveWeather.setString(1, weather.getCity());
                 saveWeather.setString(2, weather.getLocalDate());
-                saveWeather.setDouble(3, weather.getTemperature());
+                saveWeather.setString(3, weather.getWeatherText());
+                saveWeather.setDouble(4, weather.getTemperature());
                 saveWeather.addBatch();
             }
             saveWeather.executeBatch();
@@ -54,40 +44,15 @@ public class DataBaseRepository {
         }
     }
 
-    //public List<Weather> getSavedToDBWeather() {
-    //    try (Connection connection = DriverManager.getConnection(DB_PATH)) {
-    //        //TODO: реализовать этот метод получения данных из таблицы погоды
-    //    } catch (SQLException throwables) {
-    //        throwables.printStackTrace();
-    //    }
-    //}
-
-    public List<Weather> getSavedToDBWeather() {
-        List<Weather> weathers = new ArrayList<>();
-        try (Connection connection = DriverManager.getConnection(DB_PATH)) {
-            Statement statement = connection.createStatement();
+    public void getSavedToDBWeather() {
+        try (Connection connection = DriverManager.getConnection(DB_PATH); Statement statement = connection.createStatement();) {
+            String getWeather = "select * from weather";
             ResultSet resultSet = statement.executeQuery(getWeather);
             while (resultSet.next()) {
-                System.out.print(resultSet.getInt("id"));
-                System.out.println(" ");
-                System.out.print(resultSet.getString("city"));
-                System.out.println(" ");
-                System.out.print(resultSet.getString("localdate"));
-                System.out.println(" ");
-                System.out.print(resultSet.getDouble("temperature"));
-                System.out.println(" ");
-                weathers.add(new Weather(resultSet.getString("city"),
-                        resultSet.getString("localdate"),
-                        resultSet.getDouble("temperature")));
+                System.out.printf("| %s | В городе %s на дату %s ожидается %s, температура - %,.2f F |\n", resultSet.getInt("id"), resultSet.getString("city"), resultSet.getString("localdate"), resultSet.getString("text"), resultSet.getDouble("temperature"));
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return weathers;
-    }
-
-    public static void main(String[] args) throws SQLException {
-        DataBaseRepository dataBaseRepository = new DataBaseRepository();
-        System.out.println(dataBaseRepository.getSavedToDBWeather());
     }
 }
