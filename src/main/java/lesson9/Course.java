@@ -1,4 +1,4 @@
-package lesson9.hw;
+package lesson9;
 
 import java.util.Objects;
 
@@ -19,9 +19,7 @@ public class Course {
 
     @Override
     public String toString() {
-        return "Course{" +
-                "name='" + name + '\'' +
-                '}';
+        return String.format("Course name: %s", name);
     }
 
     @Override

@@ -1,54 +1,31 @@
 package lesson9;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) {
-        List<Person> personList = new ArrayList<>();
-        personList.add(new Person("Oleg", 21, Person.Position.ENGINEER));
-        personList.add(new Person("Anton", 54, Person.Position.MANAGER));
-        personList.add(new Person("Oksana", 23, Person.Position.DIRECTOR));
-        personList.add(new Person("Aleksey", 43, Person.Position.ENGINEER));
-        personList.add(new Person("Andrey", 23, Person.Position.MANAGER));
-        personList.add(new Person("Oleg", 32, Person.Position.ENGINEER));
+        List<Student> students = new ArrayList<>();
+        students.add(new Student("Diana", Arrays.asList(new Course("CS"), new Course("Management"),
+                new Course("Farming"))));
+        students.add(new Student("Anatoly", Arrays.asList(new Course("CS"), new Course("Math"))));
+        students.add(new Student("Pavel", Arrays.asList(new Course("Testing"), new Course("Squash"),
+                new Course("Speaking"), new Course("Drawing"), new Course("CS"))));
+        students.add(new Student("Masha", Collections.singletonList(new Course("Testing"))));
 
-        //Выбрать инженеров и и отсортировать их по возрасту
+        System.out.println(students.stream()
+                .map(Student::getCourses)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet()));
 
-        System.out.println(personList.stream()
-                .filter(p -> p.getPosition() == Person.Position.ENGINEER)
-                .sorted((p1, p2) -> p1.getAge() - p2.getAge())
+        System.out.println(students.stream()
+                .sorted((s1, s2) -> s2.getCourses().size() - s1.getCourses().size())
+                .limit(3)
                 .collect(Collectors.toList()));
 
-        Optional<Integer> sumAges = personList.stream()
-                .map(p -> p.getAge())
-                .reduce((p1, p2) -> p1 + p2);
-
-        if (sumAges.isPresent()) {
-            System.out.println("Все прошло ок!");
-        }
-
-        Stream<Integer> integerStream = Stream.of();
-        Optional<Integer> optionalInteger = integerStream.reduce((a1, a2) -> a1 + a2);
-
-        if (optionalInteger.isPresent()) {
-            System.out.println("Результат: " + optionalInteger.get());
-        }
-
-        Stream.of("123", "1234", "123", "345345")
-                .distinct()
-                .forEach(p -> System.out.println(p));
-
-        Stream.of("123", "1234", "123", "345345")
-                .collect(Collectors.toSet());
-
-        Integer[][] integers = new Integer[][] {{1, 2, 3}, {4, 3, 2}};
-
-        Stream.of(integers)
-                .flatMap(a -> Stream.of(a))
-                .forEach(System.out::println);
+        Course course = new Course("CS");
+        System.out.println(students.stream()
+                .filter(s -> s.getCourses().contains(course))
+                .collect(Collectors.toList()));
     }
 }
