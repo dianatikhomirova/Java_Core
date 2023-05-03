@@ -1,4 +1,4 @@
-package lesson9.hw;
+package lesson9;
 
 import java.util.List;
 
@@ -29,9 +29,6 @@ public class Student {
 
     @Override
     public String toString() {
-        return "Student{" +
-                "name='" + name + '\'' +
-                ", courses=" + courses +
-                '}';
+        return String.format("Student name: %s, courses: %s", name, courses);
     }
 }
